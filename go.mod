@@ -14,7 +14,6 @@ require (
 	github.com/twmb/go-cache v1.2.0
 	github.com/twmb/tlscfg v1.2.1
 	go.uber.org/automaxprocs v1.5.3
-	golang.org/x/sys v0.13.0
 )
 
 require (
@@ -24,5 +23,6 @@ require (
 	github.com/lmittmann/tint v1.0.2 // indirect
 	github.com/pierrec/lz4/v4 v4.1.18 // indirect
 	github.com/twmb/franz-go/pkg/kmsg v1.7.0 // indirect
+	golang.org/x/sys v0.13.0 // indirect
 	golang.org/x/term v0.13.0 // indirect
 )

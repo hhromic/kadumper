@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/signal"
 	"runtime"
+	"syscall"
 	"time"
 
 	"github.com/alexflint/go-arg"
@@ -21,7 +22,6 @@ import (
 	"github.com/twmb/go-cache/cache"
 	"github.com/twmb/tlscfg"
 	"go.uber.org/automaxprocs/maxprocs"
-	"golang.org/x/sys/unix"
 )
 
 //nolint:lll,tagalign
@@ -152,7 +152,7 @@ func appMain(logger *slog.Logger, args args) error {
 		"dump_key", args.DumpKey,
 	)
 
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, unix.SIGTERM)
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
 	logger.Info("pinging Kafka cluster")
