@@ -28,6 +28,25 @@ For the same example `fieldTwo` field shown above, `kadumper` outputs the follow
 
 As added convenience, `kadumper` can also output raw textual data (non-Avro) from Kafka.
 
+## Usage
+
+All currently available command-line arguments can be seen with `-h/--help`.
+
+Consuming Avro data from Kafka is currently only supported in
+[Confluent Wire format](https://docs.confluent.io/cloud/current/sr/fundamentals/serdes-develop/index.html#wire-format)
+with schemas automatically downloaded from a Schema Registry instance.
+Downloaded schemas are cached with a configurable maximum caching age.
+[Confluent Platform](https://docs.confluent.io/platform/current/overview.html) and
+[Redpanda](https://redpanda.com/) have both been tested.
+
+To output raw textual data (non-Avro) from Kafka, omit the `--schema-registry-url` argument.
+
+Output Kafka records are separated by a newline `\n` character. For each record, output timestamps,
+partitions, offsets, keys and values are separated by a TAB `\t` character. All output is sent to
+the standard output.
+
+Currently, only anonymous plain-text and mutual TLS authentication connections are supported.
+
 ## Building
 
 > **Note:** Ready-to-use binaries are available in the
