@@ -30,6 +30,7 @@ type args struct {
 	Topics            []string       `arg:"--topics,env:KADUMPER_TOPICS,required" help:"topics to consume from" placeholder:"TOPIC"`
 	ConsumerGroup     string         `arg:"--consumer-group,env:KADUMPER_CONSUMER_GROUP" help:"consumer group for distributed consumption" placeholder:"GROUP"`
 	SchemaRegistryURL *url.URL       `arg:"--schema-registry-url,env:KADUMPER_SCHEMA_REGISTRY_URL" help:"URL of the schema registry" placeholder:"URL"`
+	SchemaMaxAge      time.Duration  `arg:"--schema-max-age,env:KADUMPER_SCHEMA_MAX_AGE" default:"1h" placeholder:"DURATION" help:"maximum caching age for storing downloaded schemas"`
 	TLSClientCert     string         `arg:"--tls-client-cert,env:KADUMPER_TLS_CLIENT_CERT" help:"TLS client certificate in PEM format" placeholder:"FILE"`
 	TLSClientKey      string         `arg:"--tls-client-key,env:KADUMPER_TLS_CLIENT_KEY" help:"TLS client key in PEM format" placeholder:"FILE"`
 	FromBeginning     bool           `arg:"--from-beginning,env:KADUMPER_FROM_BEGINNING" help:"start consuming from the beginning of the topic(s) instead of from the end"`
@@ -122,13 +123,14 @@ func appMain(logger *slog.Logger, args args) error {
 			RegistryClient: rcl,
 			Cache: cache.New[int, *goavro.Codec](
 				cache.AutoCleanInterval(time.Minute*30), //nolint:gomnd
-				cache.MaxAge(time.Hour),
+				cache.MaxAge(args.SchemaMaxAge),
 			),
 		}
 
 		logger.Info(
 			"schema registry client and Avro deserializer initialized",
 			"url", args.SchemaRegistryURL,
+			"schema_max_age", args.SchemaMaxAge,
 		)
 	}
 
