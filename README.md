@@ -1,6 +1,32 @@
-# kadumper
+# Kafka Avro Dumper
 
 Kafka Avro dumping utility written in Go.
+
+Most command-line tools that can consume Avro records from Kafka output data using
+[Avro JSON encoding](https://avro.apache.org/docs/current/specification/#json-encoding).
+When using Avro [union types](https://avro.apache.org/docs/current/specification/#unions),
+the Avro JSON encoding includes the specific type in the field to disambiguate.
+
+For example, for a `fieldTwo` field defined as type `[null, string]` in Avro:
+```json
+{"fieldOne":100,"fieldTwo":{"string":"hello"}}
+```
+
+While the above is necessary for correctly encoding JSON data into Avro, it can become inconvenient
+when decoding plain JSON data from Avro and feeding it into non-Avro applications for processing.
+
+For a more conveniently decoded JSON data, this tool uses the
+[`goavro`](https://pkg.go.dev/github.com/linkedin/goavro/v2) library. More specifically, `kadumper`
+uses the [`NewCodecForStandardJSONFull`](https://pkg.go.dev/github.com/linkedin/goavro/v2#NewCodecForStandardJSONFull)
+codec which (from the documentation) _provides full serialization/deserialization for JSON data that
+meets the expectations of regular internet JSON_.
+
+For the same example `fieldTwo` field shown above, `kadumper` outputs the following JSON data:
+```json
+{"fieldOne":100,"fieldTwo":"hello"}
+```
+
+As added convenience, `kadumper` can also output raw textual data (non-Avro) from Kafka.
 
 ## Building
 
