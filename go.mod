@@ -2,8 +2,6 @@ module github.com/hhromic/kadumper
 
 go 1.21.0
 
-toolchain go1.21.3
-
 require (
 	github.com/alexflint/go-arg v1.4.3
 	github.com/hhromic/go-toolkit v0.0.0-20231030152050-a88c885fa318
