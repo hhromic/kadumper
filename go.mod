@@ -4,10 +4,10 @@ go 1.21.0
 
 require (
 	github.com/alexflint/go-arg v1.4.3
-	github.com/hhromic/go-toolkit v0.0.0-20231030152050-a88c885fa318
+	github.com/hhromic/go-toolkit v0.0.0-20231108200246-4a0fe3a96ef0
 	github.com/linkedin/goavro/v2 v2.12.0
-	github.com/twmb/franz-go v1.15.1
-	github.com/twmb/franz-go/pkg/sr v0.0.0-20231023211414-6ebcb430e6ec
+	github.com/twmb/franz-go v1.15.2
+	github.com/twmb/franz-go/pkg/sr v0.0.0-20231101211055-33e15f9cbd6e
 	github.com/twmb/franz-go/plugin/kslog v1.0.0
 	github.com/twmb/go-cache v1.2.0
 	github.com/twmb/tlscfg v1.2.1
@@ -23,5 +23,5 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/pierrec/lz4/v4 v4.1.18 // indirect
 	github.com/twmb/franz-go/pkg/kmsg v1.7.0 // indirect
-	golang.org/x/sys v0.13.0 // indirect
+	golang.org/x/sys v0.14.0 // indirect
 )
