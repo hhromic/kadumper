@@ -4,10 +4,10 @@ go 1.21.0
 
 require (
 	github.com/alexflint/go-arg v1.4.3
-	github.com/hhromic/go-toolkit v0.0.0-20231108200246-4a0fe3a96ef0
+	github.com/hhromic/go-toolkit v0.0.0-20231112004528-3ea087c85533
 	github.com/linkedin/goavro/v2 v2.12.0
 	github.com/twmb/franz-go v1.15.2
-	github.com/twmb/franz-go/pkg/sr v0.0.0-20231101211055-33e15f9cbd6e
+	github.com/twmb/franz-go/pkg/sr v0.0.0-20231112180303-a6d10d4ad935
 	github.com/twmb/franz-go/plugin/kslog v1.0.0
 	github.com/twmb/go-cache v1.2.0
 	github.com/twmb/tlscfg v1.2.1
@@ -17,7 +17,7 @@ require (
 require (
 	github.com/alexflint/go-scalar v1.2.0 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/klauspost/compress v1.17.2 // indirect
+	github.com/klauspost/compress v1.17.3 // indirect
 	github.com/lmittmann/tint v1.0.3 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
