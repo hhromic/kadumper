@@ -12,6 +12,9 @@ import (
 	"github.com/twmb/go-cache/cache"
 )
 
+//nolint:gochecknoglobals
+var defaultHeader = &sr.ConfluentHeader{}
+
 // Deserializer is a binary data deserializer.
 type Deserializer interface {
 	// DeserializeJSON deserializes binary data into JSON representation.
@@ -25,8 +28,6 @@ type AvroCodecCache = cache.Cache[int, *goavro.Codec]
 //
 // Avro schemas are automatically downloaded and cached from a schema registry service.
 type AvroDeserializer struct {
-	// Header is the header to use for decoding schema IDs contained in Avro binary data.
-	Header sr.SerdeHeader
 	// RegistryClient is the schema registry client to use for downloading schemas.
 	RegistryClient *sr.Client
 	// Cache is the cache to use for caching downloaded schemas.
@@ -37,7 +38,7 @@ type AvroDeserializer struct {
 //
 // Schema IDs are decoded from the data and codecs are retrieved using [AvroDeserializer.CodecForSchemaID].
 func (ad *AvroDeserializer) DeserializeJSON(ctx context.Context, data []byte) ([]byte, error) {
-	schID, payload, err := ad.Header.DecodeID(data)
+	schID, payload, err := defaultHeader.DecodeID(data)
 	if err != nil {
 		return nil, fmt.Errorf("schema ID header decode: %w", err)
 	}

@@ -18,7 +18,6 @@ import (
 	"github.com/hhromic/kadumper/internal/buildinfo"
 	"github.com/hhromic/kadumper/internal/kadumper"
 	"github.com/linkedin/goavro/v2"
-	"github.com/twmb/franz-go/pkg/sr"
 	"github.com/twmb/go-cache/cache"
 	"github.com/twmb/tlscfg"
 	"go.uber.org/automaxprocs/maxprocs"
@@ -134,7 +133,6 @@ func appMain(logger *slog.Logger, args args) error {
 		}
 
 		rdmp.Deserializer = &kadumper.AvroDeserializer{
-			Header:         &sr.ConfluentHeader{},
 			RegistryClient: rcl,
 			Cache: cache.New[int, *goavro.Codec](
 				cache.AutoCleanInterval(time.Minute*30), //nolint:gomnd
