@@ -17,7 +17,7 @@ when decoding plain JSON data from Avro and feeding it into non-Avro application
 
 For a more conveniently decoded JSON data, this tool uses the
 [`goavro`](https://pkg.go.dev/github.com/linkedin/goavro/v2) library. More specifically, `kadumper`
-uses the [`NewCodecForStandardJSONFull`](https://pkg.go.dev/github.com/linkedin/goavro/v2#NewCodecForStandardJSONFull)
+uses the [Standard Full JSON](https://pkg.go.dev/github.com/linkedin/goavro/v2#NewCodecForStandardJSONFull)
 codec which (from the documentation) _provides full serialization/deserialization for JSON data that
 meets the expectations of regular internet JSON_.
 
