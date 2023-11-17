@@ -70,6 +70,9 @@ func appMain(logger *slog.Logger, args args) error {
 		"gomaxprocs", runtime.GOMAXPROCS(0),
 	)
 
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
 	var tcfg *tls.Config
 
 	if args.TLSClientCert != "" && args.TLSClientKey != "" {
@@ -110,7 +113,14 @@ func appMain(logger *slog.Logger, args args) error {
 		"from_beginning", args.FromBeginning,
 	)
 
-	var adeser *kadumper.AvroDeserializer
+	rdmp := &kadumper.RecordDumper{
+		Deserializer:  nil,
+		DumpTimestamp: args.DumpTimestamp,
+		DumpPartition: args.DumpPartition,
+		DumpOffset:    args.DumpOffset,
+		DumpKey:       args.DumpKey,
+		Writer:        bufio.NewWriter(os.Stdout),
+	}
 
 	if args.SchemaRegistryURL != nil {
 		rcl, err := kadumper.NewRegistryClient(*args.SchemaRegistryURL, tcfg)
@@ -118,7 +128,12 @@ func appMain(logger *slog.Logger, args args) error {
 			return fmt.Errorf("new registry client: %w", err)
 		}
 
-		adeser = &kadumper.AvroDeserializer{
+		stypes, err := rcl.SupportedTypes(ctx)
+		if err != nil {
+			return fmt.Errorf("registry supported types: %w", err)
+		}
+
+		rdmp.Deserializer = &kadumper.AvroDeserializer{
 			Header:         &sr.ConfluentHeader{},
 			RegistryClient: rcl,
 			Cache: cache.New[int, *goavro.Codec](
@@ -130,18 +145,9 @@ func appMain(logger *slog.Logger, args args) error {
 		logger.Info(
 			"schema registry client and Avro deserializer initialized",
 			"url", args.SchemaRegistryURL,
+			"supported_types", stypes,
 			"schema_max_age", args.SchemaMaxAge,
 		)
-	}
-
-	rdmp := &kadumper.RecordDumper{
-		Deserializer:    adeser,
-		DumpTimestamp:   args.DumpTimestamp,
-		DumpPartition:   args.DumpPartition,
-		DumpOffset:      args.DumpOffset,
-		DumpKey:         args.DumpKey,
-		UseDeserializer: adeser != nil,
-		Writer:          bufio.NewWriter(os.Stdout),
 	}
 
 	logger.Info(
@@ -152,25 +158,10 @@ func appMain(logger *slog.Logger, args args) error {
 		"dump_key", args.DumpKey,
 	)
 
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
-	defer stop()
-
 	logger.Info("pinging Kafka cluster")
 
 	if err := kcl.Ping(ctx); err != nil {
 		return fmt.Errorf("kafka cluster ping: %w", err)
-	}
-
-	if adeser != nil {
-		stypes, err := adeser.RegistryClient.SupportedTypes(ctx)
-		if err != nil {
-			return fmt.Errorf("registry supported types: %w", err)
-		}
-
-		logger.Info(
-			"schema registry contacted",
-			"supported_types", stypes,
-		)
 	}
 
 	logger.Info(

@@ -23,8 +23,6 @@ type RecordDumper struct {
 	DumpOffset bool
 	// DumpKey is whether to dump Kafka record keys.
 	DumpKey bool
-	// UseDeserializer is whether to use the deserializer for dumping Kafka records.
-	UseDeserializer bool
 	// Writer is the buffered writer to use for dumping Kafka records.
 	Writer *bufio.Writer
 }
@@ -73,7 +71,7 @@ func (rd *RecordDumper) DumpRecord(ctx context.Context, record *kgo.Record) erro
 // WriteData deserializes data into JSON representation using [RecordDumper.Deserializer] and
 // writes the result using [RecordDumper.Writer].
 func (rd *RecordDumper) WriteData(ctx context.Context, data []byte) error {
-	if rd.UseDeserializer {
+	if rd.Deserializer != nil {
 		json, err := rd.Deserializer.DeserializeJSON(ctx, data)
 		if err != nil {
 			return fmt.Errorf("deserialize JSON: %w", err)
