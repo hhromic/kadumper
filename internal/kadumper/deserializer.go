@@ -13,7 +13,7 @@ import (
 )
 
 //nolint:gochecknoglobals
-var defaultHeader = &sr.ConfluentHeader{}
+var defaultHeader sr.ConfluentHeader
 
 // Deserializer is a binary data deserializer.
 type Deserializer interface {
