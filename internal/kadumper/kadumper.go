@@ -14,7 +14,7 @@ import (
 func DumpRecords(
 	ctx context.Context,
 	kcl *kgo.Client,
-	rdmp *RecordDumper,
+	rdmp RecordDumper,
 	maxRecords int,
 ) error {
 	records := 0

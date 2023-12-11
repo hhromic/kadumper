@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"context"
 	"crypto/tls"
 	"fmt"
@@ -25,21 +24,22 @@ import (
 
 //nolint:lll,tagalign
 type args struct {
-	SeedBrokers       []string       `arg:"--seed-brokers,env:KADUMPER_SEED_BROKERS,required" help:"Kafka bootstrap/seed brokers" placeholder:"BROKER"`
-	Topics            []string       `arg:"--topics,env:KADUMPER_TOPICS,required" help:"topics to consume from" placeholder:"TOPIC"`
-	ConsumerGroup     string         `arg:"--consumer-group,env:KADUMPER_CONSUMER_GROUP" help:"consumer group for distributed consumption" placeholder:"GROUP"`
-	SchemaRegistryURL *url.URL       `arg:"--schema-registry-url,env:KADUMPER_SCHEMA_REGISTRY_URL" help:"URL of the schema registry" placeholder:"URL"`
-	SchemaMaxAge      time.Duration  `arg:"--schema-max-age,env:KADUMPER_SCHEMA_MAX_AGE" default:"1h" placeholder:"DURATION" help:"maximum caching age for storing downloaded schemas"`
-	TLSClientCert     string         `arg:"--tls-client-cert,env:KADUMPER_TLS_CLIENT_CERT" help:"TLS client certificate in PEM format" placeholder:"FILE"`
-	TLSClientKey      string         `arg:"--tls-client-key,env:KADUMPER_TLS_CLIENT_KEY" help:"TLS client key in PEM format" placeholder:"FILE"`
-	FromBeginning     bool           `arg:"--from-beginning,env:KADUMPER_FROM_BEGINNING" help:"start consuming from the beginning of the topic(s) instead of from the end"`
-	MaxRecords        int            `arg:"--max-records,env:KADUMPER_MAX_RECORDS" default:"0" help:"maximum number of records to consume ('0' for unlimited)" placeholder:"NUMBER"`
-	DumpTimestamp     bool           `arg:"--dump-timestamp,env:KADUMPER_DUMP_TIMESTAMP" help:"whether to dump the timestamp of consumed records"`
-	DumpPartition     bool           `arg:"--dump-partition,env:KADUMPER_DUMP_PARTITION" help:"whether to dump the partition number of consumed records"`
-	DumpOffset        bool           `arg:"--dump-offset,env:KADUMPER_DUMP_OFFSET" help:"whether to dump the partition offset of consumed records"`
-	DumpKey           bool           `arg:"--dump-key,env:KADUMPER_DUMP_KEY" help:"whether to dump the key of consumed records"`
-	LogHandler        tkslog.Handler `arg:"--log-handler,env:KADUMPER_LOG_HANDLER" default:"auto" placeholder:"HANDLER" help:"application logging handler"`
-	LogLevel          slog.Level     `arg:"--log-level,env:KADUMPER_LOG_LEVEL" default:"info" placeholder:"LEVEL" help:"application logging level"`
+	SeedBrokers       []string        `arg:"--seed-brokers,env:KADUMPER_SEED_BROKERS,required" placeholder:"BROKER" help:"Kafka bootstrap/seed brokers"`
+	Topics            []string        `arg:"--topics,env:KADUMPER_TOPICS,required" placeholder:"TOPIC" help:"topics to consume from"`
+	ConsumerGroup     string          `arg:"--consumer-group,env:KADUMPER_CONSUMER_GROUP" placeholder:"GROUP" help:"consumer group for distributed consumption"`
+	SchemaRegistryURL *url.URL        `arg:"--schema-registry-url,env:KADUMPER_SCHEMA_REGISTRY_URL" placeholder:"URL" help:"URL of the schema registry"`
+	SchemaMaxAge      time.Duration   `arg:"--schema-max-age,env:KADUMPER_SCHEMA_MAX_AGE" default:"1h" placeholder:"DURATION" help:"maximum caching age for storing downloaded schemas"`
+	TLSClientCert     string          `arg:"--tls-client-cert,env:KADUMPER_TLS_CLIENT_CERT" placeholder:"FILE" help:"TLS client certificate in PEM format"`
+	TLSClientKey      string          `arg:"--tls-client-key,env:KADUMPER_TLS_CLIENT_KEY" placeholder:"FILE" help:"TLS client key in PEM format"`
+	FromBeginning     bool            `arg:"--from-beginning,env:KADUMPER_FROM_BEGINNING" help:"start consuming from the beginning of the topic(s) instead of from the end"`
+	MaxRecords        int             `arg:"--max-records,env:KADUMPER_MAX_RECORDS" default:"0" placeholder:"NUMBER" help:"maximum number of records to consume ('0' for unlimited)"`
+	Dumper            kadumper.Dumper `arg:"--dumper,env:KADUMPER_DUMPER" default:"stdout" placeholder:"DUMPER" help:"Kafka records dumper to use for output"`
+	DumpTimestamp     bool            `arg:"--dump-timestamp,env:KADUMPER_DUMP_TIMESTAMP" help:"whether to dump the timestamp of consumed records"`
+	DumpPartition     bool            `arg:"--dump-partition,env:KADUMPER_DUMP_PARTITION" help:"whether to dump the partition number of consumed records"`
+	DumpOffset        bool            `arg:"--dump-offset,env:KADUMPER_DUMP_OFFSET" help:"whether to dump the partition offset of consumed records"`
+	DumpKey           bool            `arg:"--dump-key,env:KADUMPER_DUMP_KEY" help:"whether to dump the key of consumed records"`
+	LogHandler        tkslog.Handler  `arg:"--log-handler,env:KADUMPER_LOG_HANDLER" default:"auto" placeholder:"HANDLER" help:"application logging handler"`
+	LogLevel          slog.Level      `arg:"--log-level,env:KADUMPER_LOG_LEVEL" default:"info" placeholder:"LEVEL" help:"application logging level"`
 }
 
 func main() {
@@ -112,49 +112,55 @@ func appMain(logger *slog.Logger, args args) error {
 		"from_beginning", args.FromBeginning,
 	)
 
-	rdmp := &kadumper.RecordDumper{
-		Deserializer:  nil,
-		DumpTimestamp: args.DumpTimestamp,
-		DumpPartition: args.DumpPartition,
-		DumpOffset:    args.DumpOffset,
-		DumpKey:       args.DumpKey,
-		Writer:        bufio.NewWriter(os.Stdout),
-	}
+	var rdmp kadumper.RecordDumper
 
-	if args.SchemaRegistryURL != nil {
-		rcl, err := kadumper.NewRegistryClient(*args.SchemaRegistryURL, tcfg)
-		if err != nil {
-			return fmt.Errorf("new registry client: %w", err)
-		}
+	switch args.Dumper {
+	case kadumper.DumperStdout:
+		stdoutDumper := kadumper.NewStdoutRecordDumper()
 
-		stypes, err := rcl.SupportedTypes(ctx)
-		if err != nil {
-			return fmt.Errorf("registry supported types: %w", err)
-		}
+		stdoutDumper.DumpTimestamp = args.DumpTimestamp
+		stdoutDumper.DumpPartition = args.DumpPartition
+		stdoutDumper.DumpOffset = args.DumpOffset
+		stdoutDumper.DumpKey = args.DumpKey
 
-		rdmp.Deserializer = &kadumper.AvroDeserializer{
-			RegistryClient: rcl,
-			Cache: cache.New[int, *goavro.Codec](
-				cache.AutoCleanInterval(time.Minute*30), //nolint:gomnd
-				cache.MaxAge(args.SchemaMaxAge),
-			),
+		if args.SchemaRegistryURL != nil {
+			rcl, err := kadumper.NewRegistryClient(*args.SchemaRegistryURL, tcfg)
+			if err != nil {
+				return fmt.Errorf("new registry client: %w", err)
+			}
+
+			stypes, err := rcl.SupportedTypes(ctx)
+			if err != nil {
+				return fmt.Errorf("registry supported types: %w", err)
+			}
+
+			stdoutDumper.Deserializer = &kadumper.AvroDeserializer{
+				RegistryClient: rcl,
+				Cache: cache.New[int, *goavro.Codec](
+					cache.AutoCleanInterval(time.Minute*30), //nolint:gomnd
+					cache.MaxAge(args.SchemaMaxAge),
+				),
+			}
+
+			logger.Info(
+				"schema registry client and Avro deserializer initialized",
+				"url", args.SchemaRegistryURL,
+				"supported_types", stypes,
+				"schema_max_age", args.SchemaMaxAge,
+			)
 		}
 
 		logger.Info(
-			"schema registry client and Avro deserializer initialized",
-			"url", args.SchemaRegistryURL,
-			"supported_types", stypes,
-			"schema_max_age", args.SchemaMaxAge,
+			"stdout record dumper initialized",
+			"with_deserializer", stdoutDumper.Deserializer != nil,
+			"dump_timestamp", stdoutDumper.DumpTimestamp,
+			"dump_partition", stdoutDumper.DumpPartition,
+			"dump_offset", stdoutDumper.DumpOffset,
+			"dump_key", stdoutDumper.DumpKey,
 		)
-	}
 
-	logger.Info(
-		"record dumper initialized",
-		"dump_timestamp", args.DumpTimestamp,
-		"dump_partition", args.DumpPartition,
-		"dump_offset", args.DumpOffset,
-		"dump_key", args.DumpKey,
-	)
+		rdmp = stdoutDumper
+	}
 
 	logger.Info("pinging Kafka cluster")
 

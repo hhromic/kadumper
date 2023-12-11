@@ -7,82 +7,57 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/twmb/franz-go/pkg/kgo"
 )
 
+// Dumper represents a supported Kafka records dumper.
+type Dumper int
+
+// Supported Kafka records dumper.
+const (
+	// DumperStdout is a Kafka records dumper which outputs records to stdout.
+	DumperStdout Dumper = iota
+)
+
+// String returns a name for the Kafka records dumper.
+func (d Dumper) String() string {
+	switch d {
+	case DumperStdout:
+		return "stdout"
+	default:
+		return ""
+	}
+}
+
+// MarshalText implements [encoding.TextMarshaler] by calling [Dumper.String].
+func (d Dumper) MarshalText() ([]byte, error) {
+	return []byte(d.String()), nil
+}
+
+// UnmarshalText implements [encoding.TextUnmarshaler].
+// It accepts any string produced by [Dumper.MarshalText].
+func (d *Dumper) UnmarshalText(b []byte) error {
+	str := string(b)
+	switch str {
+	case DumperStdout.String():
+		*d = DumperStdout
+	default:
+		return fmt.Errorf("%w: %q", ErrUnknownDumperName, str)
+	}
+
+	return nil
+}
+
 // RecordDumper is a Kafka records dumper.
-type RecordDumper struct {
-	// Deserializer is the deserializer to use for Kafka record keys and values.
-	Deserializer Deserializer
-	// DumpTimestamp is whether to dump Kafka record timestamps.
-	DumpTimestamp bool
-	// DumpPartition is whether to dump Kafka record partition numbers.
-	DumpPartition bool
-	// DumpOffset is whether to dump Kafka record partition offsets.
-	DumpOffset bool
-	// DumpKey is whether to dump Kafka record keys.
-	DumpKey bool
-	// Writer is the buffered writer to use for dumping Kafka records.
-	Writer *bufio.Writer
+type RecordDumper interface {
+	DumpRecord(ctx context.Context, record *kgo.Record) error
 }
 
-// DumpRecord dumps a Kafka record.
-func (rd *RecordDumper) DumpRecord(ctx context.Context, record *kgo.Record) error {
-	defer rd.Writer.Flush()
-
-	if rd.DumpTimestamp {
-		fmt.Fprintf(rd.Writer, "%d\t", record.Timestamp.UnixMilli())
+// NewStdoutRecordDumper creates a new Kafka records dumper which outputs records to stdout.
+func NewStdoutRecordDumper() *WriterRecordDumper {
+	return &WriterRecordDumper{ //nolint:exhaustruct
+		Writer: bufio.NewWriter(os.Stdout),
 	}
-
-	if rd.DumpPartition {
-		fmt.Fprintf(rd.Writer, "%d\t", record.Partition)
-	}
-
-	if rd.DumpOffset {
-		fmt.Fprintf(rd.Writer, "%d\t", record.Offset)
-	}
-
-	if rd.DumpKey {
-		if record.Key != nil {
-			if err := rd.WriteData(ctx, record.Key); err != nil {
-				return fmt.Errorf("write key data: %w", err)
-			}
-		} else {
-			fmt.Fprint(rd.Writer, "null")
-		}
-
-		fmt.Fprint(rd.Writer, "\t")
-	}
-
-	if record.Value != nil {
-		if err := rd.WriteData(ctx, record.Value); err != nil {
-			return fmt.Errorf("write value data: %w", err)
-		}
-	} else {
-		fmt.Fprint(rd.Writer, "null")
-	}
-
-	fmt.Fprint(rd.Writer, "\n")
-
-	return nil
-}
-
-// WriteData deserializes data into JSON representation using [RecordDumper.Deserializer] and
-// writes the result using [RecordDumper.Writer].
-func (rd *RecordDumper) WriteData(ctx context.Context, data []byte) error {
-	if rd.Deserializer != nil {
-		json, err := rd.Deserializer.DeserializeJSON(ctx, data)
-		if err != nil {
-			return fmt.Errorf("deserialize JSON: %w", err)
-		}
-
-		data = json
-	}
-
-	if _, err := rd.Writer.Write(data); err != nil {
-		return fmt.Errorf("write: %w", err)
-	}
-
-	return nil
 }
