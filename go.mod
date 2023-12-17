@@ -7,7 +7,7 @@ require (
 	github.com/hhromic/go-toolkit v0.0.0-20231201183147-406e93a83c69
 	github.com/linkedin/goavro/v2 v2.12.0
 	github.com/twmb/franz-go v1.15.3
-	github.com/twmb/franz-go/pkg/sr v0.0.0-20231206062516-c09dc92d2db1
+	github.com/twmb/franz-go/pkg/sr v0.0.0-20231217185338-a9e75b82b472
 	github.com/twmb/franz-go/plugin/kslog v1.0.0
 	github.com/twmb/go-cache v1.2.0
 	github.com/twmb/tlscfg v1.2.1
