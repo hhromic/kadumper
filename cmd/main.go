@@ -32,7 +32,8 @@ type args struct {
 	TLSClientCert     string          `arg:"--tls-client-cert,env:KADUMPER_TLS_CLIENT_CERT" placeholder:"FILE" help:"TLS client certificate in PEM format"`
 	TLSClientKey      string          `arg:"--tls-client-key,env:KADUMPER_TLS_CLIENT_KEY" placeholder:"FILE" help:"TLS client key in PEM format"`
 	FromBeginning     bool            `arg:"--from-beginning,env:KADUMPER_FROM_BEGINNING" help:"start consuming from the beginning of the topic(s) instead of from the end"`
-	MaxRecords        int             `arg:"--max-records,env:KADUMPER_MAX_RECORDS" default:"0" placeholder:"NUMBER" help:"maximum number of records to consume ('0' for unlimited)"`
+	MaxRecords        int             `arg:"--max-records,env:KADUMPER_MAX_RECORDS" default:"0" placeholder:"NUMBER" help:"maximum number of records to consume before exiting ('0' for unlimited)"`
+	FetchTimeout      time.Duration   `arg:"--fetch-timeout,env:KADUMPER_FETCH_TIMEOUT" default:"0s" placeholder:"DURATION" help:"records fetch timeout before exiting ('0s' for unlimited)"`
 	Dumper            kadumper.Dumper `arg:"--dumper,env:KADUMPER_DUMPER" default:"stdout" placeholder:"DUMPER" help:"Kafka records dumper to use for output"`
 	DumpTimestamp     bool            `arg:"--dump-timestamp,env:KADUMPER_DUMP_TIMESTAMP" help:"whether to dump the timestamp of consumed records"`
 	DumpPartition     bool            `arg:"--dump-partition,env:KADUMPER_DUMP_PARTITION" help:"whether to dump the partition number of consumed records"`
@@ -114,7 +115,7 @@ func appMain(logger *slog.Logger, args args) error {
 
 	var rdmp kadumper.RecordDumper
 
-	switch args.Dumper {
+	switch args.Dumper { //nolint:gocritic
 	case kadumper.DumperStdout:
 		stdoutDumper := kadumper.NewStdoutRecordDumper()
 
@@ -173,7 +174,7 @@ func appMain(logger *slog.Logger, args args) error {
 		"max_records", args.MaxRecords,
 	)
 
-	if err := kadumper.DumpRecords(ctx, kcl, rdmp, args.MaxRecords); err != nil {
+	if err := kadumper.DumpRecords(ctx, kcl, rdmp, args.MaxRecords, args.FetchTimeout); err != nil {
 		return fmt.Errorf("dump records: %w", err)
 	}
 

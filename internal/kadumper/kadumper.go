@@ -7,19 +7,35 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/twmb/franz-go/pkg/kgo"
 )
 
+//nolint:cyclop
 func DumpRecords(
 	ctx context.Context,
 	kcl *kgo.Client,
 	rdmp RecordDumper,
 	maxRecords int,
+	fetchTimeout time.Duration,
 ) error {
+	pollFunc := func() kgo.Fetches {
+		return kcl.PollFetches(ctx)
+	}
+
+	if fetchTimeout.Nanoseconds() > 0 {
+		pollFunc = func() kgo.Fetches {
+			ctx, cancel := context.WithTimeout(ctx, fetchTimeout)
+			defer cancel()
+
+			return kcl.PollFetches(ctx)
+		}
+	}
+
 	records := 0
 	for maxRecords == 0 || records < maxRecords {
-		fetches := kcl.PollFetches(ctx)
+		fetches := pollFunc()
 
 		if fetches.IsClientClosed() {
 			return ErrKafkaClientClosed
@@ -27,7 +43,12 @@ func DumpRecords(
 
 		if ferrs := fetches.Errors(); len(ferrs) > 0 {
 			var errs []error
+
 			for _, ferr := range ferrs {
+				if errors.Is(ferr.Err, context.DeadlineExceeded) {
+					return nil
+				}
+
 				errs = append(errs, ferr.Err)
 			}
 
