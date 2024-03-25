@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/url"
@@ -174,7 +175,8 @@ func appMain(logger *slog.Logger, args args) error {
 		"max_records", args.MaxRecords,
 	)
 
-	if err := kadumper.DumpRecords(ctx, kcl, rdmp, args.MaxRecords, args.FetchTimeout); err != nil {
+	err = kadumper.DumpRecords(ctx, kcl, rdmp, args.MaxRecords, args.FetchTimeout)
+	if err != nil && !errors.Is(err, context.Canceled) {
 		return fmt.Errorf("dump records: %w", err)
 	}
 
