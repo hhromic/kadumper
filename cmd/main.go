@@ -44,6 +44,11 @@ type args struct {
 	LogLevel          slog.Level      `arg:"--log-level,env:KADUMPER_LOG_LEVEL" default:"info" placeholder:"LEVEL" help:"application logging level"`
 }
 
+func (args) Description() string {
+	return "Kafka Avro dumper version " + buildinfo.Version +
+		" (git:" + buildinfo.GitBranch + "/" + buildinfo.GitCommit + ")"
+}
+
 func main() {
 	var args args
 	_ = arg.MustParse(&args)
