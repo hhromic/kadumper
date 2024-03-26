@@ -173,6 +173,7 @@ func appMain(logger *slog.Logger, args args) error {
 	logger.Info(
 		"dumping records",
 		"max_records", args.MaxRecords,
+		"fetch_timeout", args.FetchTimeout,
 	)
 
 	err = kadumper.DumpRecords(ctx, kcl, rdmp, args.MaxRecords, args.FetchTimeout)
