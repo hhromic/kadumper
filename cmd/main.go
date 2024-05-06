@@ -144,7 +144,7 @@ func appMain(logger *slog.Logger, args args) error {
 			stdoutDumper.Deserializer = &kadumper.AvroDeserializer{
 				RegistryClient: rcl,
 				Cache: cache.New[int, *goavro.Codec](
-					cache.AutoCleanInterval(time.Minute*30), //nolint:gomnd
+					cache.AutoCleanInterval(time.Minute*30), //nolint:mnd
 					cache.MaxAge(args.SchemaMaxAge),
 				),
 			}
