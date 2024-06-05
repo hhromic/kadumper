@@ -14,7 +14,7 @@ import (
 
 // NewRegistryClient returns a new schema registry client.
 func NewRegistryClient(srURL url.URL, tcfg *tls.Config) (*sr.Client, error) {
-	opts := []sr.Opt{
+	opts := []sr.ClientOpt{
 		sr.URLs(srURL.String()),
 	}
 
