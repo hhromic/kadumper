@@ -3,11 +3,11 @@ module github.com/hhromic/kadumper
 go 1.22.0
 
 require (
-	github.com/alexflint/go-arg v1.4.3
-	github.com/hhromic/go-toolkit v0.0.0-20240325213920-0dc8508dccc1
+	github.com/alexflint/go-arg v1.5.0
+	github.com/hhromic/go-toolkit v0.0.0-20240528221625-da900e00522e
 	github.com/linkedin/goavro/v2 v2.13.0
-	github.com/twmb/franz-go v1.16.1
-	github.com/twmb/franz-go/pkg/sr v0.0.0-20240430054423-8b5395896363
+	github.com/twmb/franz-go v1.17.0
+	github.com/twmb/franz-go/pkg/sr v1.0.0
 	github.com/twmb/franz-go/plugin/kslog v1.0.0
 	github.com/twmb/go-cache v1.2.1
 	github.com/twmb/tlscfg v1.2.1
@@ -22,6 +22,6 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/pierrec/lz4/v4 v4.1.21 // indirect
-	github.com/twmb/franz-go/pkg/kmsg v1.7.0 // indirect
-	golang.org/x/sys v0.20.0 // indirect
+	github.com/twmb/franz-go/pkg/kmsg v1.8.0 // indirect
+	golang.org/x/sys v0.21.0 // indirect
 )
