@@ -3,7 +3,7 @@ module github.com/hhromic/kadumper
 go 1.22.0
 
 require (
-	github.com/alexflint/go-arg v1.5.0
+	github.com/alexflint/go-arg v1.5.1
 	github.com/hhromic/go-toolkit v0.0.0-20240528221625-da900e00522e
 	github.com/linkedin/goavro/v2 v2.13.0
 	github.com/twmb/franz-go v1.17.0
@@ -17,7 +17,7 @@ require (
 require (
 	github.com/alexflint/go-scalar v1.2.0 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/klauspost/compress v1.17.8 // indirect
+	github.com/klauspost/compress v1.17.9 // indirect
 	github.com/lmittmann/tint v1.0.4 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
