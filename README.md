@@ -52,9 +52,17 @@ Currently, only anonymous plain-text and mutual TLS authentication connections a
 > **Note:** Ready-to-use binaries are available in the
 > [releases page](https://github.com/hhromic/kadumper/releases).
 
-To build a snapshot locally Using [GoReleaser](https://goreleaser.com/):
+To build a snapshot locally using [GoReleaser](https://goreleaser.com/):
 ```
 goreleaser build --clean --single-target --output kadumper --snapshot
+```
+
+## Releasing
+
+To release a new version in GitHub using [GoReleaser](https://goreleaser.com/):
+```
+git tag vX.Y.Z
+CGO_ENABLED=0 GITHUB_TOKEN=$(< /path/to/token) goreleaser release --clean
 ```
 
 ## License
