@@ -54,7 +54,7 @@ Currently, only anonymous plain-text and mutual TLS authentication connections a
 
 To build a snapshot locally using [GoReleaser](https://goreleaser.com/):
 ```
-goreleaser build --clean --single-target --output kadumper --snapshot
+goreleaser build --clean --single-target --snapshot
 ```
 
 ## Releasing
