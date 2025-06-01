@@ -28,31 +28,43 @@ type WriterRecordDumper struct {
 }
 
 // DumpRecord dumps a Kafka record to the configured buffered writer.
+//
+//nolint:cyclop
 func (wrd *WriterRecordDumper) DumpRecord(ctx context.Context, record *kgo.Record) error {
-	defer wrd.Writer.Flush()
+	defer wrd.Writer.Flush() //nolint:errcheck
 
 	if wrd.DumpTimestamp {
-		fmt.Fprintf(wrd.Writer, "%d\t", record.Timestamp.UnixMilli())
+		if _, err := fmt.Fprintf(wrd.Writer, "%d\t", record.Timestamp.UnixMilli()); err != nil {
+			return fmt.Errorf("write timestamp: %w", err)
+		}
 	}
 
 	if wrd.DumpPartition {
-		fmt.Fprintf(wrd.Writer, "%d\t", record.Partition)
+		if _, err := fmt.Fprintf(wrd.Writer, "%d\t", record.Partition); err != nil {
+			return fmt.Errorf("write partition: %w", err)
+		}
 	}
 
 	if wrd.DumpOffset {
-		fmt.Fprintf(wrd.Writer, "%d\t", record.Offset)
+		if _, err := fmt.Fprintf(wrd.Writer, "%d\t", record.Offset); err != nil {
+			return fmt.Errorf("write offset: %w", err)
+		}
 	}
 
-	if wrd.DumpKey {
+	if wrd.DumpKey { //nolint:nestif
 		if record.Key != nil {
 			if err := wrd.writeData(ctx, record.Key); err != nil {
 				return fmt.Errorf("write key data: %w", err)
 			}
 		} else {
-			fmt.Fprint(wrd.Writer, "null")
+			if _, err := fmt.Fprint(wrd.Writer, "null"); err != nil {
+				return fmt.Errorf("write null key: %w", err)
+			}
 		}
 
-		fmt.Fprint(wrd.Writer, "\t")
+		if _, err := fmt.Fprint(wrd.Writer, "\t"); err != nil {
+			return fmt.Errorf("write key tab separator: %w", err)
+		}
 	}
 
 	if record.Value != nil {
@@ -60,10 +72,14 @@ func (wrd *WriterRecordDumper) DumpRecord(ctx context.Context, record *kgo.Recor
 			return fmt.Errorf("write value data: %w", err)
 		}
 	} else {
-		fmt.Fprint(wrd.Writer, "null")
+		if _, err := fmt.Fprint(wrd.Writer, "null"); err != nil {
+			return fmt.Errorf("write null value: %w", err)
+		}
 	}
 
-	fmt.Fprint(wrd.Writer, "\n")
+	if _, err := fmt.Fprint(wrd.Writer, "\n"); err != nil {
+		return fmt.Errorf("write newline: %w", err)
+	}
 
 	return nil
 }

@@ -12,6 +12,8 @@ import (
 	"github.com/twmb/franz-go/pkg/kgo"
 )
 
+// DumpRecords dumps records from Kafka using a provided client and record dumper.
+//
 //nolint:cyclop
 func DumpRecords(
 	ctx context.Context,
