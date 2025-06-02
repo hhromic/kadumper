@@ -7,6 +7,7 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"log/slog"
 
 	"github.com/twmb/franz-go/pkg/kgo"
 )
@@ -23,8 +24,12 @@ type WriterRecordDumper struct {
 	DumpOffset bool
 	// DumpKey is whether to dump Kafka record keys.
 	DumpKey bool
+	// NoFail is whether to fail on non-fatal errors.
+	NoFail bool
 	// Writer is the buffered writer to use for dumping Kafka records.
 	Writer *bufio.Writer
+	// Logger is the slog logger to use for operational logging.
+	Logger *slog.Logger
 }
 
 // DumpRecord dumps a Kafka record to the configured buffered writer.
@@ -87,11 +92,17 @@ func (wrd *WriterRecordDumper) DumpRecord(ctx context.Context, record *kgo.Recor
 func (wrd *WriterRecordDumper) writeData(ctx context.Context, data []byte) error {
 	if wrd.Deserializer != nil {
 		json, err := wrd.Deserializer.DeserializeJSON(ctx, data)
-		if err != nil {
-			return fmt.Errorf("deserialize JSON: %w", err)
-		}
 
-		data = json
+		switch {
+		case err != nil && !wrd.NoFail:
+			return fmt.Errorf("deserialize JSON: %w", err)
+		case err != nil:
+			wrd.Logger.Warn("error during JSON deserialize", "err", err)
+
+			data = []byte("null")
+		default:
+			data = json
+		}
 	}
 
 	if _, err := wrd.Writer.Write(data); err != nil {

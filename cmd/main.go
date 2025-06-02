@@ -43,6 +43,7 @@ type args struct {
 	DumpPartition     bool            `arg:"--dump-partition,env:KADUMPER_DUMP_PARTITION" help:"whether to dump the partition number of consumed records"`
 	DumpOffset        bool            `arg:"--dump-offset,env:KADUMPER_DUMP_OFFSET" help:"whether to dump the partition offset of consumed records"`
 	DumpKey           bool            `arg:"--dump-key,env:KADUMPER_DUMP_KEY" help:"whether to dump the key of consumed records"`
+	NoFail            bool            `arg:"--no-fail,env:KADUMPER_NO_FAIL" help:"do not fail/exit on non-fatal errors"`
 	LogHandler        tkslog.Handler  `arg:"--log-handler,env:KADUMPER_LOG_HANDLER" default:"auto" placeholder:"HANDLER" help:"application logging handler"`
 	LogLevel          slog.Level      `arg:"--log-level,env:KADUMPER_LOG_LEVEL" default:"info" placeholder:"LEVEL" help:"application logging level"`
 }
@@ -127,11 +128,13 @@ func appMain(logger *slog.Logger, args args) error {
 	switch args.Dumper { //nolint:gocritic
 	case kadumper.DumperStdout:
 		stdoutDumper := kadumper.NewStdoutRecordDumper()
+		stdoutDumper.Logger = logger
 
 		stdoutDumper.DumpTimestamp = args.DumpTimestamp
 		stdoutDumper.DumpPartition = args.DumpPartition
 		stdoutDumper.DumpOffset = args.DumpOffset
 		stdoutDumper.DumpKey = args.DumpKey
+		stdoutDumper.NoFail = args.NoFail
 
 		if args.SchemaRegistryURL != nil {
 			rcl, err := kadumper.NewRegistryClient(*args.SchemaRegistryURL, tcfg)
@@ -167,6 +170,7 @@ func appMain(logger *slog.Logger, args args) error {
 			"dump_partition", stdoutDumper.DumpPartition,
 			"dump_offset", stdoutDumper.DumpOffset,
 			"dump_key", stdoutDumper.DumpKey,
+			"no_fail", stdoutDumper.NoFail,
 		)
 
 		rdmp = stdoutDumper
