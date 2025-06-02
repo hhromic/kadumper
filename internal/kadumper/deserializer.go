@@ -65,7 +65,10 @@ func (ad *AvroDeserializer) DeserializeJSON(ctx context.Context, data []byte) ([
 //
 // Available codecs are managed using [AvroDeserializer.Cache]. If a requested codec is not found in
 // the cache, a schema is downloaded from the schema registry and a new codec is created and cached.
-func (ad *AvroDeserializer) CodecForSchemaID(ctx context.Context, schID int) (*goavro.Codec, error) {
+func (ad *AvroDeserializer) CodecForSchemaID(
+	ctx context.Context,
+	schID int,
+) (*goavro.Codec, error) {
 	codec, _, ks := ad.Cache.TryGet(schID)
 	if ks != cache.Hit {
 		sch, err := ad.RegistryClient.SchemaByID(ctx, schID)

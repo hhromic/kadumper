@@ -10,3 +10,14 @@ linters:
     recvcheck:
       exclusions:
         - '*.UnmarshalText'
+
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+    - golines
+  settings:
+    golines:
+      reformat-tags: false
