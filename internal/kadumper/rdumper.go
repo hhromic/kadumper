@@ -13,8 +13,6 @@ import (
 )
 
 // Dumper represents a supported Kafka records dumper.
-//
-//nolint:recvcheck
 type Dumper int
 
 // Supported Kafka records dumper.

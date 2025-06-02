@@ -7,3 +7,6 @@ linters:
   settings:
     misspell:
       locale: US
+    recvcheck:
+      exclusions:
+        - '*.UnmarshalText'
