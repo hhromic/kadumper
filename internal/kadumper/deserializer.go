@@ -50,12 +50,12 @@ func (ad *AvroDeserializer) DeserializeJSON(ctx context.Context, data []byte) ([
 
 	nat, _, err := codec.NativeFromBinary(payload)
 	if err != nil {
-		return nil, fmt.Errorf("avro codec native from binary: %w", err)
+		return nil, fmt.Errorf("avro codec native from binary for schema ID: %d: %w", schID, err)
 	}
 
 	data, err = codec.TextualFromNative(nil, nat)
 	if err != nil {
-		return nil, fmt.Errorf("avro codec textual from native: %w", err)
+		return nil, fmt.Errorf("avro codec textual from native for schema ID: %d: %w", schID, err)
 	}
 
 	return data, nil
@@ -73,12 +73,12 @@ func (ad *AvroDeserializer) CodecForSchemaID(
 	if ks != cache.Hit {
 		sch, err := ad.RegistryClient.SchemaByID(ctx, schID)
 		if err != nil {
-			return nil, fmt.Errorf("registry schema text by ID: %w", err)
+			return nil, fmt.Errorf("registry schema text by ID: %d: %w", schID, err)
 		}
 
 		codec, err = goavro.NewCodecForStandardJSONFull(sch.Schema)
 		if err != nil {
-			return nil, fmt.Errorf("new avro codec: %w", err)
+			return nil, fmt.Errorf("new avro codec for schema ID: %d: %w", schID, err)
 		}
 
 		ad.Cache.Set(schID, codec)
