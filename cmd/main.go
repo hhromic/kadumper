@@ -58,7 +58,7 @@ func (args) Version() string {
 
 func main() {
 	var args args
-	_ = arg.MustParse(&args)
+	arg.MustParse(&args)
 
 	logger := tkslog.NewSlogLogger(os.Stderr, args.LogHandler, args.LogLevel)
 
