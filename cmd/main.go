@@ -49,8 +49,11 @@ type args struct {
 }
 
 func (args) Description() string {
-	return "Kafka Avro dumper version " + buildinfo.Version +
-		" (git:" + buildinfo.GitBranch + "/" + buildinfo.GitCommit + ")"
+	return "Kafka Avro dumping utility."
+}
+
+func (args) Version() string {
+	return buildinfo.Version + " (git:" + buildinfo.GitBranch + "/" + buildinfo.GitCommit + ")"
 }
 
 func main() {
