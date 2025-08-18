@@ -23,7 +23,6 @@ import (
 	"github.com/linkedin/goavro/v2"
 	"github.com/twmb/go-cache/cache"
 	"github.com/twmb/tlscfg"
-	"go.uber.org/automaxprocs/maxprocs"
 )
 
 //nolint:lll,tagalign
@@ -70,10 +69,6 @@ func main() {
 
 //nolint:funlen,cyclop
 func appMain(logger *slog.Logger, args args) error {
-	if _, err := maxprocs.Set(); err != nil {
-		slog.Warn("failed to set GOMAXPROCS", "err", err)
-	}
-
 	logger.Info("starting",
 		"version", buildinfo.Version,
 		"goversion", buildinfo.GoVersion,
