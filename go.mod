@@ -6,7 +6,7 @@ require (
 	github.com/alexflint/go-arg v1.6.0
 	github.com/hhromic/go-toolkit v0.0.0-20251111214751-a457fabb3288
 	github.com/linkedin/goavro/v2 v2.14.1
-	github.com/twmb/franz-go v1.20.4
+	github.com/twmb/franz-go v1.20.5
 	github.com/twmb/franz-go/pkg/sr v1.5.0
 	github.com/twmb/franz-go/plugin/kslog v1.0.0
 	github.com/twmb/go-cache v1.2.1
