@@ -18,11 +18,20 @@ import (
 
 	"github.com/alexflint/go-arg"
 	tkslog "github.com/hhromic/go-toolkit/slog"
-	"github.com/hhromic/kadumper/internal/buildinfo"
 	"github.com/hhromic/kadumper/internal/kadumper"
 	"github.com/linkedin/goavro/v2"
 	"github.com/twmb/go-cache/cache"
 	"github.com/twmb/tlscfg"
+)
+
+// Build info vars populated by GoReleaser.
+//
+//nolint:gochecknoglobals
+var (
+	BuildDate = "unknown"
+	GitBranch = "unknown"
+	GitCommit = "unknown"
+	Version   = "unknown"
 )
 
 //nolint:lll,tagalign
@@ -52,7 +61,7 @@ func (args) Description() string {
 }
 
 func (args) Version() string {
-	return buildinfo.Version + " (git:" + buildinfo.GitBranch + "/" + buildinfo.GitCommit + ")"
+	return Version + " (git:" + GitBranch + "/" + GitCommit + ")"
 }
 
 func main() {
@@ -70,11 +79,11 @@ func main() {
 //nolint:funlen,cyclop
 func appMain(logger *slog.Logger, args args) error {
 	logger.Info("starting",
-		"version", buildinfo.Version,
-		"goversion", buildinfo.GoVersion,
-		"gitcommit", buildinfo.GitCommit,
-		"gitbranch", buildinfo.GitBranch,
-		"builddate", buildinfo.BuildDate,
+		"version", Version,
+		"goversion", runtime.Version(),
+		"gitcommit", GitCommit,
+		"gitbranch", GitBranch,
+		"builddate", BuildDate,
 		"gomaxprocs", runtime.GOMAXPROCS(0),
 	)
 

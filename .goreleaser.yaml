@@ -10,10 +10,10 @@ builds:
   - main: ./cmd
     ldflags:
       - -s -w
-      - -X {{.ModulePath}}/internal/buildinfo.BuildDate={{.Date}}
-      - -X {{.ModulePath}}/internal/buildinfo.GitBranch={{.Branch}}
-      - -X {{.ModulePath}}/internal/buildinfo.GitCommit={{.ShortCommit}}
-      - -X {{.ModulePath}}/internal/buildinfo.Version={{.Version}}
+      - -X main.BuildDate={{.Date}}
+      - -X main.GitBranch={{.Branch}}
+      - -X main.GitCommit={{.ShortCommit}}
+      - -X main.Version={{.Version}}
     no_unique_dist_dir: '{{.IsSingleTarget}}'
 
 archives:
