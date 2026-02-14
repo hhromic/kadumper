@@ -8,8 +8,8 @@ github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSs
 github.com/golang/snappy v0.0.1/go.mod h1:/XxbfmMg8lxefKM7IXC3fBNl/7bRcc72aCRzEWrmP2Q=
 github.com/golang/snappy v1.0.0 h1:Oy607GVXHs7RtbggtPBnr2RmDArIsAefDwvrdWvRhGs=
 github.com/golang/snappy v1.0.0/go.mod h1:/XxbfmMg8lxefKM7IXC3fBNl/7bRcc72aCRzEWrmP2Q=
-github.com/hhromic/go-toolkit v0.0.0-20260211225118-2d9f8a2bf46e h1:0D175lXq+6zN3K79LsSWXMhw7urh87xSSMl84aDnc5Y=
-github.com/hhromic/go-toolkit v0.0.0-20260211225118-2d9f8a2bf46e/go.mod h1:kdzt7wJ/MVafc87fmlXl4QpT0K3ghwPXJY+d4vHj3Ek=
+github.com/hhromic/go-toolkit v0.0.0-20260214231043-9678ef09e56d h1:9pxnjs0tAu0KvWW4owlc42GKxXRubTvPCK7GaBit3g0=
+github.com/hhromic/go-toolkit v0.0.0-20260214231043-9678ef09e56d/go.mod h1:kdzt7wJ/MVafc87fmlXl4QpT0K3ghwPXJY+d4vHj3Ek=
 github.com/klauspost/compress v1.18.4 h1:RPhnKRAQ4Fh8zU2FY/6ZFDwTVTxgJ/EMydqSTzE9a2c=
 github.com/klauspost/compress v1.18.4/go.mod h1:R0h/fSBs8DE4ENlcrlib3PsXS61voFxhIs2DeRhCvJ4=
 github.com/linkedin/goavro/v2 v2.15.0 h1:pDj1UrjUOO62iXhgBiE7jQkpNIc5/tA5eZsgolMjgVI=

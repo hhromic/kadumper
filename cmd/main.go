@@ -17,7 +17,7 @@ import (
 	"time"
 
 	"github.com/alexflint/go-arg"
-	tkslog "github.com/hhromic/go-toolkit/slog"
+	"github.com/hhromic/go-toolkit/slogkit"
 	"github.com/hhromic/kadumper/internal/kadumper"
 	"github.com/linkedin/goavro/v2"
 	"github.com/twmb/go-cache/cache"
@@ -52,7 +52,7 @@ type args struct {
 	DumpOffset        bool            `arg:"--dump-offset,env:KADUMPER_DUMP_OFFSET" help:"whether to dump the partition offset of consumed records"`
 	DumpKey           bool            `arg:"--dump-key,env:KADUMPER_DUMP_KEY" help:"whether to dump the key of consumed records"`
 	NoFail            bool            `arg:"--no-fail,env:KADUMPER_NO_FAIL" help:"do not fail/exit on non-fatal errors"`
-	LogHandler        tkslog.Handler  `arg:"--log-handler,env:KADUMPER_LOG_HANDLER" default:"auto" placeholder:"HANDLER" help:"application logging handler"`
+	LogHandler        slogkit.Handler `arg:"--log-handler,env:KADUMPER_LOG_HANDLER" default:"auto" placeholder:"HANDLER" help:"application logging handler"`
 	LogLevel          slog.Level      `arg:"--log-level,env:KADUMPER_LOG_LEVEL" default:"info" placeholder:"LEVEL" help:"application logging level"`
 }
 
@@ -68,7 +68,7 @@ func main() {
 	var args args
 	arg.MustParse(&args)
 
-	logger := tkslog.NewSlogLogger(os.Stderr, args.LogHandler, args.LogLevel)
+	logger := slogkit.NewLogger(os.Stderr, args.LogHandler, args.LogLevel)
 
 	if err := appMain(logger, args); err != nil {
 		logger.Error("application error", "err", err)
