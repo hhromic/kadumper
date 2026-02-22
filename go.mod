@@ -4,9 +4,9 @@ go 1.26.0
 
 require (
 	github.com/alexflint/go-arg v1.6.1
-	github.com/hhromic/go-toolkit v0.0.0-20260214231043-9678ef09e56d
+	github.com/hhromic/go-toolkit v0.0.0-20260217223743-ad73d887db67
 	github.com/linkedin/goavro/v2 v2.15.0
-	github.com/twmb/franz-go v1.20.6
+	github.com/twmb/franz-go v1.20.7
 	github.com/twmb/franz-go/pkg/sr v1.6.0
 	github.com/twmb/franz-go/plugin/kslog v1.0.0
 	github.com/twmb/go-cache v1.2.1
