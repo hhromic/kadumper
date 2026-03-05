@@ -10,7 +10,7 @@ require (
 	github.com/twmb/franz-go/pkg/sr v1.6.0
 	github.com/twmb/franz-go/plugin/kslog v1.0.0
 	github.com/twmb/go-cache v1.2.1
-	github.com/twmb/tlscfg v1.2.1
+	github.com/twmb/tlscfg v1.3.0
 )
 
 require (
