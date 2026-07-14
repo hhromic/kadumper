@@ -41,6 +41,7 @@ type args struct {
 	ConsumerGroup     string          `arg:"--consumer-group,env:KADUMPER_CONSUMER_GROUP" placeholder:"GROUP" help:"consumer group for distributed consumption"`
 	SchemaRegistryURL *url.URL        `arg:"--schema-registry-url,env:KADUMPER_SCHEMA_REGISTRY_URL" placeholder:"URL" help:"URL of the schema registry"`
 	SchemaMaxAge      time.Duration   `arg:"--schema-max-age,env:KADUMPER_SCHEMA_MAX_AGE" default:"1h" placeholder:"DURATION" help:"maximum caching age for storing downloaded schemas"`
+	TLSCACert         string          `arg:"--tls-ca-cert,env:KADUMPER_TLS_CA_CERT" placeholder:"FILE" help:"TLS CA certificate in PEM format"`
 	TLSClientCert     string          `arg:"--tls-client-cert,env:KADUMPER_TLS_CLIENT_CERT" placeholder:"FILE" help:"TLS client certificate in PEM format"`
 	TLSClientKey      string          `arg:"--tls-client-key,env:KADUMPER_TLS_CLIENT_KEY" placeholder:"FILE" help:"TLS client key in PEM format"`
 	FromBeginning     bool            `arg:"--from-beginning,env:KADUMPER_FROM_BEGINNING" help:"start consuming from the beginning of the topic(s) instead of from the end"`
@@ -92,8 +93,9 @@ func appMain(logger *slog.Logger, args args) error {
 
 	var tcfg *tls.Config
 
-	if args.TLSClientCert != "" && args.TLSClientKey != "" {
+	if args.TLSCACert != "" || args.TLSClientCert != "" || args.TLSClientKey != "" {
 		cfg, err := tlscfg.New(
+			tlscfg.MaybeWithDiskCA(args.TLSCACert, tlscfg.ForClient),
 			tlscfg.MaybeWithDiskKeyPair(args.TLSClientCert, args.TLSClientKey),
 		)
 		if err != nil {
@@ -104,6 +106,7 @@ func appMain(logger *slog.Logger, args args) error {
 
 		logger.Info(
 			"TLS configuration initialized",
+			"tls_ca_cert", args.TLSCACert,
 			"tls_client_cert", args.TLSClientCert,
 			"tls_client_key", args.TLSClientKey,
 		)
