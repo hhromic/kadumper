@@ -57,7 +57,7 @@ type RecordDumper interface {
 
 // NewStdoutRecordDumper creates a new Kafka records dumper which outputs records to stdout.
 func NewStdoutRecordDumper() *WriterRecordDumper {
-	return &WriterRecordDumper{ //nolint:exhaustruct
+	return &WriterRecordDumper{ //nolint:exhaustruct_v5
 		Writer: bufio.NewWriter(os.Stdout),
 	}
 }

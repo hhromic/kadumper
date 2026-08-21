@@ -19,8 +19,8 @@ func NewRegistryClient(srURL url.URL, tcfg *tls.Config) (*sr.Client, error) {
 	}
 
 	if tcfg != nil {
-		cl := &http.Client{ //nolint:exhaustruct
-			Transport: &http.Transport{ //nolint:exhaustruct
+		cl := &http.Client{ //nolint:exhaustruct_v5
+			Transport: &http.Transport{ //nolint:exhaustruct_v5
 				TLSClientConfig: tcfg,
 			},
 		}
